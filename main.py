@@ -58,7 +58,7 @@ class Snake:
     def move_right(self):
         self.direction = 'right'
 
-    def slither(self):
+    def slither(self):#snake moverment and directions
 
         for i in range(self.length-1,0,-1):
             self.x[i] = self.x[i - 1]
@@ -115,16 +115,19 @@ class Game:
         score = font.render(f"Score: {self.snake.length}", True, (255,255,255))
         self.surface.blit(score, (550,10))
 
+#game over funtion of  the game
     def game_over_text(self):
         self.surface.fill(BACKGROUND_COLOR)
         font = pygame.font.SysFont('arial', 20)
         line1 = font.render(f"Your game is over and final score is: {self.snake.length}", True, (255,255,255))
         self.surface.blit(line1, (150,200))
-        line2 = font.render(f"To play again press Enter", True, (255,255,255))
+        line2 = font.render(f"To play again press Enter. To exit press Escape", True, (255,255,255))
         self.surface.blit(line2, (150,250))
         pygame.display.flip()
     
-
+    def reset(self):#resets score to  the value defined in snake
+        self.snake = Snake(self.surface, 2)
+        self.apple = Apple(self.surface)
     def run(self):
         running = True
         pause = False
@@ -159,6 +162,7 @@ class Game:
             except Exception as e:
                     self.game_over_text()
                     pause = True
+                    self.reset()
 
 
             time.sleep(0.2)
