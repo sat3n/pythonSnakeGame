@@ -4,6 +4,7 @@ import time
 import random
 
 SIZE = 40
+BACKGROUND_COLOR = (250,105,55)
 class Apple:
     def __init__(self,parent_screen):
         self.image = pygame.image.load("/Users/satenderkundu/Coding/pythonSnakeGame/resources/apple.jpg").convert()
@@ -40,7 +41,7 @@ class Snake:
 
 
     def draw(self):
-        self.parent_screen.fill((250,105,55))
+        self.parent_screen.fill(BACKGROUND_COLOR)
         for i in range(self.length):
             self.parent_screen.blit(self.block, (self.x[i], self.y[i]))
         pygame.display.flip()
@@ -78,7 +79,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.surface = pygame.display.set_mode((700, 500))
-        self.surface.fill((250,105,55))
+        self.surface.fill(BACKGROUND_COLOR)
         self.snake = Snake(self.surface, 2)
         self.snake.draw()
         self.apple = Apple(self.surface)
@@ -102,16 +103,31 @@ class Game:
 #here we increment the length of the snake everytime it hits the apple using the  coordinates to determinne the collision
         if self.apple_gulp(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
             self.snake.increase_length()#defined earlier 
-            self.apple.move() #this ,oves the apple now using the function defined above
+            self.apple.move()#defined in apple class
+      
         #snake collision with self
+        for i in range(1, self.snake.length):
+            if self.apple_gulp(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
+                raise "Game Over"
         
     def display_score(self):#uses the font funcn of pygame to render the score fonts and uses the snake.length value to show as score
         font = pygame.font.SysFont('arial', 20)
         score = font.render(f"Score: {self.snake.length}", True, (255,255,255))
         self.surface.blit(score, (550,10))
 
+    def game_over_text(self):
+        self.surface.fill(BACKGROUND_COLOR)
+        font = pygame.font.SysFont('arial', 20)
+        line1 = font.render(f"Your game is over and final score is: {self.snake.length}", True, (255,255,255))
+        self.surface.blit(line1, (150,200))
+        line2 = font.render(f"To play again press Enter", True, (255,255,255))
+        self.surface.blit(line2, (150,250))
+        pygame.display.flip()
+    
+
     def run(self):
         running = True
+        pause = False
 #run logic of the game with key detection and snake movement
         while running:
             for event in pygame.event.get():
@@ -119,22 +135,31 @@ class Game:
                     if event.key == K_ESCAPE:
                         running = False
 
-                    if event.key == K_UP:
-                        self.snake.move_up()
-                        
-                    if event.key == K_DOWN:
-                        self.snake.move_down()
-                                            
-                    if event.key == K_LEFT:
-                        self.snake.move_left()
+                    if event.key == K_RETURN:
+                        pause=False
 
-                    if event.key == K_RIGHT:
-                        self.snake.move_right()
+                    if not pause:
+                        if event.key == K_UP:
+                            self.snake.move_up()
+                        
+                        if event.key == K_DOWN:
+                            self.snake.move_down()
+                                                
+                        if event.key == K_LEFT:
+                            self.snake.move_left()
+
+                        if event.key == K_RIGHT:
+                            self.snake.move_right()
 
                 elif event.type == QUIT:
                     running = False
-            
-            self.play()
+            try:
+                if not pause:
+                    self.play()
+            except Exception as e:
+                    self.game_over_text()
+                    pause = True
+
 
             time.sleep(0.2)
 
