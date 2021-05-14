@@ -78,6 +78,7 @@ class Snake:
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.surface = pygame.display.set_mode((700, 500))
         self.surface.fill(BACKGROUND_COLOR)
         self.snake = Snake(self.surface, 2)
@@ -93,7 +94,9 @@ class Game:
 
         return False
 
-
+    def play_sound(self, sound):
+        sound = pygame.mixer.Sound("/Users/satenderkundu/Coding/pythonSnakeGame/resources/(sound).mp3")
+        pygame.mixer.Sound.play(sound)
 
     def play(self):
         self.snake.slither()
@@ -102,12 +105,14 @@ class Game:
         pygame.display.flip()
 #here we increment the length of the snake everytime it hits the apple using the  coordinates to determinne the collision
         if self.apple_gulp(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
-            self.snake.increase_length()#defined earlier 
+            self.snake.increase_length()#defined earlier
+            self.play_sound("ding")
             self.apple.move()#defined in apple class
       
         #snake collision with self
         for i in range(1, self.snake.length):
             if self.apple_gulp(self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]):
+                self.play_sound("crash")
                 raise "Game Over"
         
     def display_score(self):#uses the font funcn of pygame to render the score fonts and uses the snake.length value to show as score
